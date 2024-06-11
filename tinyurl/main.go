@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	_ "github.com/a-kumar5/go-projects/tinyurl/docs"
+	"github.com/a-kumar5/go-projects/tinyurl/initializers"
 	"github.com/a-kumar5/go-projects/tinyurl/pkg/encoder"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -28,13 +29,18 @@ var urls = []url{
 	{Long: "http://www.google.com", Short: "go.com"},
 }
 
+func init() {
+	initializers.LoadEnvVariables()
+	initializers.ConnectToDB()
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/ping", getHealth)
 	router.POST("/create-url", createUrl)
 	router.GET("/:shorturl", getShortUrl)
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	router.Run("localhost:8080")
+	router.Run()
 }
 
 // PingExample godoc
