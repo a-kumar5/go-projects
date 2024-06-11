@@ -9,8 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-
 func ConnectToDB() *gorm.DB {
 	var err error
 	db_host := os.Getenv("DB_HOST")
