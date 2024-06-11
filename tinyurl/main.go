@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	_ "github.com/a-kumar5/go-projects/tinyurl/docs"
+	"github.com/a-kumar5/go-projects/tinyurl/pkg/encoder"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -61,7 +62,8 @@ func createUrl(c *gin.Context) {
 
 func (l *lurl) createShortUrl() surl {
 	var shortUrl surl
-	shortUrl = surl{Short: "xyz.com"}
+	numUrl := encoder.ToNumber(l.Long)
+	shortUrl = surl{Short: encoder.ToBase62(numUrl)}
 	return shortUrl
 }
 
