@@ -1,0 +1,39 @@
+info:
+  contact: {}
+paths:
+  /{shortUrl}:
+    get:
+      consumes:
+      - application/json
+      description: Permanent Redirect
+      produces:
+      - application/json
+      responses:
+        "301":
+          description: Moved Permanently
+          schema:
+            type: Permanent
+      summary: get tiny url
+  /create-url:
+    post:
+      consumes:
+      - application/json
+      description: create tiny url
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: create tiny url
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: ping example
+swagger: "2.0"
