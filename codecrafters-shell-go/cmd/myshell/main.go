@@ -7,36 +7,59 @@ import (
 	"strings"
 )
 
-func main() {
-	//fmt.Fprint(os.Stdout, "$ ")
+var KnownCommands = map[string]int{"exit": 0, "echo": 1, "type": 2}
 
-	// Wait for user input
-	//command, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	//fmt.Fprintf(os.Stdout, command[:len(command)-1]+": command not found\n")
-	reader := bufio.NewScanner(os.Stdin)
-	printPrompt()
-	for reader.Scan() {
-		/*
-			text := reader.Text()
-			if text := reader.Text(); text == "exit 0" {
-				os.Exit(0)
-			}
-			fmt.Fprintf(os.Stdout, strings.TrimSpace(text)+": command not found\n")
-			printPrompt()
-		*/
-		cmdline := strings.Fields(strings.TrimSpace(reader.Text()))
-		cmd := cmdline[0]
-		args := strings.Join(cmdline[1:], " ")
-		switch cmd {
-		case "exit":
-			os.Exit(0)
-		case "echo":
-			fmt.Fprintf(os.Stdout, args+"\n")
-		default:
-			fmt.Fprintf(os.Stdout, strings.Join(cmdline, " ")+": command not found\n")
+func main() {
+	for {
+		fmt.Fprint(os.Stdout, "$ ")
+		input, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		if err != nil {
+			fmt.Println("error: ", err)
+			os.Exit(1)
 		}
-		printPrompt()
+		input = strings.TrimRight(input, "\n")
+		tokenizedInput := strings.Split(input, " ")
+		cmd := tokenizedInput[0]
+		if fn, exists := KnownCommands[cmd]; !exists {
+			fmt.Fprintf(os.Stdout, "%v: command not found\n", input)
+		} else {
+			switch fn {
+			case 0:
+				DoExit(tokenizedInput[1:])
+			case 1:
+				DoEcho(tokenizedInput[1:])
+			case 2:
+				DoType(tokenizedInput[1:])
+			}
+		}
 	}
+}
+
+func DoType(params []string) {
+	item := params[0]
+	if _, exists := KnownCommands[item]; exists {
+		fmt.Fprintf(os.Stdout, "%v is a shell builtin\n", item)
+	} else {
+		env := os.Getenv("PATH")
+		paths := strings.Split(env, ":")
+		for _, path := range paths {
+			exec := path + "/" + item
+			if _, err := os.Stat(exec); err == nil {
+				fmt.Fprintf(os.Stdout, "%v is %v\n", item, exec)
+				return
+			}
+		}
+		fmt.Fprintf(os.Stdout, "%v: not found\n", item)
+	}
+}
+
+func DoEcho(params []string) {
+	output := strings.Join(params, " ")
+	fmt.Fprintf(os.Stdout, "%v\n", output)
+}
+
+func DoExit(params []string) {
+	os.Exit(0)
 }
 
 func printPrompt() {
