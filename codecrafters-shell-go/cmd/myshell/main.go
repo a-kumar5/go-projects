@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -21,7 +22,11 @@ func main() {
 		tokenizedInput := strings.Split(input, " ")
 		cmd := tokenizedInput[0]
 		if fn, exists := KnownCommands[cmd]; !exists {
-			fmt.Fprintf(os.Stdout, "%v: command not found\n", input)
+			if output := RunCmd(tokenizedInput); len(output) > 0 {
+				fmt.Printf("%s", output)
+			} else {
+				fmt.Fprintf(os.Stdout, "%v: command not found\n", input)
+			}
 		} else {
 			switch fn {
 			case 0:
@@ -33,6 +38,13 @@ func main() {
 			}
 		}
 	}
+}
+
+func RunCmd(args []string) []byte {
+	cmd := exec.Command(args[0], args[1:]...)
+	b, _ := cmd.CombinedOutput()
+
+	return b
 }
 
 func DoType(params []string) {
