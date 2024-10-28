@@ -1,0 +1,16 @@
+version: '2'
+sql:
+- name: "db"
+  schema: "./db/migration/"
+  queries: "./db/query/"
+  engine: "postgresql"
+  database:
+    uri: postgresql://postgres:postgres@localhost:5433/simple_bank?sslmode=disable
+  gen:
+    go:
+      package: account
+      out: "./db/postgresql"
+      emit_json_tags: true
+      emit_prepared_queries: false
+      emit_interface: false
+      emit_exact_table_names: false
