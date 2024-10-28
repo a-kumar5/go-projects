@@ -6,3 +6,7 @@ INSERT INTO accounts (
 ) VALUES (
   $1, $2, $3
 ) RETURNING *;
+
+-- name: GetAccounts :one
+SELECT * FROM accounts
+WHERE id = $1;
