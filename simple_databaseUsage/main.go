@@ -35,7 +35,7 @@ func main() {
 
 	fmt.Printf("ID = %d\n", pk)
 
-	p := *queryProduct(db, pk)
+	p := queryProduct(db, pk)
 
 	fmt.Printf("name = %s\n price = %v\n available = %v", p.Name, p.Price, p.Available)
 }
@@ -77,16 +77,13 @@ func insertProduct(db *sql.DB, product Product) int {
 	return pk
 }
 
-func queryProduct(db *sql.DB, pk int) *Product {
+func queryProduct(db *sql.DB, pk int) Product {
 	query := "SELECT name, price, available FROM product WHERE id=$1"
 
-	var name string
-	var available bool
-	var price float64
-
-	err := db.QueryRow(query, pk).Scan(&name, &price, &available)
+	var p Product
+	err := db.QueryRow(query, pk).Scan(&p.Name, &p.Price, &p.Available)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &Product{name, price, available}
+	return p
 }
