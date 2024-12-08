@@ -9,6 +9,41 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
 
+type OrderPlacer struct {
+	producer   *kafka.Producer
+	topic      string
+	deliverych chan kafka.Event
+}
+
+func NewOrderPlacer(p *kafka.Producer, topic string) *OrderPlacer {
+	return &OrderPlacer{
+		producer:   p,
+		topic:      topic,
+		deliverych: make(chan kafka.Event, 10000),
+	}
+}
+
+func (op *OrderPlacer) placeOrder(orderType string, size int) error {
+	var (
+		format  = fmt.Sprintf("%s - %d", orderType, size)
+		payload = []byte(format)
+	)
+	err := op.producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{
+			Topic:     &op.topic,
+			Partition: kafka.PartitionAny,
+		},
+		Value: payload,
+	},
+		op.deliverych,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	<-op.deliverych
+	return nil
+}
+
 func main() {
 	topic := "notification"
 
@@ -47,22 +82,11 @@ func main() {
 		}
 	}()
 
-	delivery_chan := make(chan kafka.Event, 10000)
-
+	op := NewOrderPlacer(p, "HVSE")
 	for {
-		err = p.Produce(&kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-			Value:          []byte("FOO"),
-		},
-			delivery_chan, // delivery channel
-		)
-		if err != nil {
-			log.Fatal(err)
-		}
-		_ = <-delivery_chan
+		op
 		time.Sleep(time.Second * 3)
 	}
-
 	//fmt.Printf("%+v\n", e.String())
 	//fmt.Printf("%+v\n", p)
 }
