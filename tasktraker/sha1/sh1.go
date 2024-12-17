@@ -41,18 +41,21 @@ func sha1Sum(fileName string) (string, error) {
 
 	defer file.Close() // deferred are called in LIFO order
 
+	var r io.Reader = file
+
 	if strings.HasSuffix(fileName, ".gz") {
-		file, err := gzip.NewReader(file)
+		gz, err := gzip.NewReader(file)
 		//io.CopyN(os.Stdout, r, 100)
 		if err != nil {
 			return "", err
 		}
-		defer file.Close()
+		defer gz.Close()
+		r = gz
 	}
 
 	w := sha1.New()
 
-	if _, err := io.Copy(w, file); err != nil {
+	if _, err := io.Copy(w, r); err != nil {
 		return "", err
 	}
 
