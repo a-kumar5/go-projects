@@ -11,3 +11,11 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+  postgres:
+    container_name: micro_postgres
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+    ports:
+      - "5433:5432"
