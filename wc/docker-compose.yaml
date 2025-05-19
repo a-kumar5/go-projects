@@ -1,0 +1,49 @@
+version: "3"
+services:
+  scylla:
+    image: scylladb/scylla:latest
+    container_name: scylla
+    restart: always
+    volumes:
+      - scylla_data:/var/lib/scylla
+      - ./backup:/backup
+    environment:
+      - SCYLLA_CLUSTER_NAME=my_cluster
+    depends_on:
+      - minio
+  minio:
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=admin123
+    volumes:
+      - minio_data:/data
+  backup:
+    image: bitnami/minio-client:latest
+    container_name: scylla_backup
+    restart: always
+    depends_on:
+      - scylla
+      - minio
+    volumes:
+      - ./backup:/backup
+      - scylla_data:/var/lib/scylla
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        mc alias set myminio http://minio:9000 admin admin123;  # Updated to match MinIO credentials
+        while true; do
+          echo "Taking ScyllaDB snapshot...";
+          nodetool snapshot -t backup_$(date +%Y%m%d_%H%M%S);
+          cp -r /var/lib/scylla/data/* /backup/;
+          mc mirror --overwrite /backup myminio/scylla-backups;
+          echo "Backup completed at $(date)";
+          sleep 600;
+        done
+volumes:
+  scylla_data:
+  minio_data:
