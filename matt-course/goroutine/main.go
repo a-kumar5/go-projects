@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -37,33 +36,51 @@ func counter(ch chan<- int) {
 	}
 }
 
+func generate(limit int, ch chan<- int) {
+	for i := 1; i <= limit; i++ {
+		ch <- i
+	}
+	close(ch)
+}
+
 func main() {
-	var nextID nextCh = make(chan int)
-	go counter(nextID)
-	http.HandleFunc("/", nextID.handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	ch := make(chan int)
+	go generate(100, ch)
+	for {
+		prime, ok := <-ch
+		if !ok {
+			break
+		}
+		fmt.Print(prime, " ")
+	}
 
 	/*
-	   results := make(chan result)
+		var nextID nextCh = make(chan int)
+		go counter(nextID)
+		http.HandleFunc("/", nextID.handler)
+		log.Fatal(http.ListenAndServe(":8080", nil))
 
-	   	list := []string{
-	   		"https://amazon.com",
-	   		"https://google.com",
-	   		"https://facebook.com",
-	   		"https://x.com",
-	   	}
 
-	   	for _, url := range list {
-	   		go get(url, results)
-	   	}
+		   results := make(chan result)
 
-	   	for range list {
-	   		r := <-results
-	   		if r.err != nil {
-	   			log.Printf("%-20s %s\n", r.url, r.err)
-	   		} else {
-	   			log.Printf("%-20s %s\n", r.url, r.latency)
-	   		}
-	   	}
+		   	list := []string{
+		   		"https://amazon.com",
+		   		"https://google.com",
+		   		"https://facebook.com",
+		   		"https://x.com",
+		   	}
+
+		   	for _, url := range list {
+		   		go get(url, results)
+		   	}
+
+		   	for range list {
+		   		r := <-results
+		   		if r.err != nil {
+		   			log.Printf("%-20s %s\n", r.url, r.err)
+		   		} else {
+		   			log.Printf("%-20s %s\n", r.url, r.latency)
+		   		}
+		   	}
 	*/
 }
