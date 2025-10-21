@@ -56,3 +56,61 @@ func main() {
 	m.Add("item", "3")         
 }
 
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+// Point represents a 2D point with X and Y coordinates
+type Point struct {
+	X, Y float64
+}
+
+// Path represents a sequence (slice) of Points
+type Path []Point
+
+// Distance (function) — calculates distance between two Points
+func Distance(p, q Point) float64 {
+	return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+
+// Distance (method) — same as above, but defined as a method on Point
+func (p Point) Distance(q Point) float64 {
+	return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+
+// Distance (method on Path) — computes total distance along a path
+func (path Path) Distance() float64 {
+	sum := 0.0
+	for i := range path {
+		if i > 0 {
+			sum += path[i-1].Distance(path[i])
+		}
+	}
+	return sum
+}
+
+func main() {
+	p := Point{1, 2}
+	q := Point{4, 6}
+
+	// Both calls compute the same distance using different styles
+	fmt.Println(Distance(p, q)) // function style
+	fmt.Println(p.Distance(q))  // method style
+
+	// Define a path and compute its total distance (perimeter)
+	perim := Path{
+		{1, 1},
+		{5, 1},
+		{5, 4},
+		{1, 1},
+	}
+
+	fmt.Println(perim.Distance()) // total distance of the path
+}
+
+
