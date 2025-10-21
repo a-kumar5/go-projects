@@ -110,6 +110,11 @@ func (path Path) Distance() float64 {
 	return sum
 }
 
+func (p *Point) ScaleBy(factor float64) {
+	p.X *= factor
+	p.Y *= factor
+}
+
 func main() {
 	p := Point{1, 2}
 	q := Point{4, 6}
@@ -127,6 +132,8 @@ func main() {
 	}
 
 	fmt.Println(perim.Distance()) // total distance of the path
+	p.ScaleBy(2)
+	fmt.Println(p)
 }
 
 
