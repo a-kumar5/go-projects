@@ -55,6 +55,22 @@ func main() {
 	// 4. Demonstrating nil map behavior for Add (PANIC)
 	m.Add("item", "3")         
 }
+```
+
+# Simple Code Example for methods
+
+This Go program demonstrates how to calculate distances between points 
+and the total length (perimeter) of a path made up of multiple points.
+
+- **Point struct**: Represents a coordinate (X, Y).
+- **Path type**: A slice of points forming a connected path.
+- **Distance() function & method**: Calculate straight-line distance between two points.
+- **Path.Distance()**: Sums distances between consecutive points to get total path length.
+- **main()**:
+  - Calculates distance between two points (1,2) and (4,6).
+  - Computes total perimeter of a rectangular path.
+  - 
+```go
 
 // You can edit this code!
 // Click here and start typing.
