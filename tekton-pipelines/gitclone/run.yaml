@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: pull-display-run-3
+  labels:
+    tekton.dev/pipeline: pull-display
+spec:
+  serviceAccountName: build-bot
+  pipelineRef:
+    name: pull-display
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  params:
+    - name: git-repo-url
+      value: "git@bitbucket.org:whizdm/devops.git"
+    - name: repo-name
+      value: "devops"  # Repository directory name, or leave empty for auto-detect
+  workspaces:
+    - name: shared-data
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi

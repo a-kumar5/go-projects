@@ -1,0 +1,30 @@
+# replace DASHBOARD_URL with the hostname you want for your dashboard
+# the hostname should be setup to point to your ingress controller
+DASHBOARD_URL=eks-tekton-dashboard.stg.whizdm.com
+kubectl delete -n tekton-pipelines -f - <<EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:196886031941:certificate/cb2d2116-c2d8-433b-b66e-84f3a37d4f08
+    alb.ingress.kubernetes.io/group.name: stg-ingress-app
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/security-groups: stg-eks-pub01-sg, sg-0599c718d4abc3b3c
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/target-type: ip
+    kubernetes.io/ingress.class: alb
+  name: tekton-dashboard
+  namespace: tekton-pipelines
+spec:
+  rules:
+  - host: $DASHBOARD_URL
+    http:
+      paths:
+      - pathType: ImplementationSpecific
+        backend:
+          service:
+            name: tekton-dashboard
+            port:
+              number: 8080
+EOF

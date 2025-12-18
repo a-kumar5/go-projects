@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: github-repo-clone-task-run
+spec:
+  workspaces:
+   - name: clonedDirectoryFolder
+     volumeClaimTemplate:
+       spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+   - name: githubSshFolder
+     secret:
+       secretName: github-repo-credentials-secret
+  params:
+    - name: repoUrl
+      value: "git@github.com:tektoncd/website.git"  #git ssh clone Url
+    - name: revision
+      value: "main"
+    - name: userHome
+      value: "/home/git"
+      #value: "/root"  # use this when the security context is set root
+      #value: "/home/nonroot"  # use this value for ealier git-init:v0.29.0
+    - name: gitInitImage
+      #value: "alpine/git:latest"
+      value: "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.40.2"
+      #value: "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.29.0"  # if you use this image, set the userHome to /home/nonroot
+  taskRef:
+    name: github-repo-clone-task

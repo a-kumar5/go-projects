@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rsa
+  annotations:
+    tekton.dev/git-0: bitbucket.org 
+type: kubernetes.io/ssh-auth
+data:
+  ssh-privatekey: LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnphQzFyWlhrdGRqRUFBQUFBQkc1dmJtVUFBQUFFYm05dVpRQUFBQUFBQUFBQkFBQUJGd0FBQUFkemMyZ3RjbgpOaEFBQUFBd0VBQVFBQUFRRUF5ZzA3SThaT2t6SDc3am1HNTdsL0NYMll1T1pnTzZvdm1IaTdtR3lEZDZpaVBNVWlndzNkCnFPSW10V2g0YWNnc3JUbzd4bTVlMEd3MnIzbVNtbU9KeFUybExhWEpsK0NGMHU5VjRJNi9pZzlMTUt2Y04vZnZTTk84RkgKVVJIWjl4bWdwa3RzVzBjamZtR2lqQ0tCVU9ON24xRmdhSy9KUzF3Vm1jWHFTTFZyT3hML3k1dUxoV3kwWXg4SU1uL2kzNgp2Zkcxa2xJLzY1RytDMkpXQ0ZJc2FLYWV0RHlWbHA1NDVWK25PNXMrUmR3enZPcy9vK3o3T2tkc3VuMkNJbWQxTHozU1JPCnNFWXVzaGZIb1ZENE9WWUJ1cXVaY2dQQzFNYXo5bjE1Q3I0WDR6WGJoV1pGQVE4S2RtM2ZOL2tmSHZOWlJhZDRrMW0rRm0KbGhOb3JvY1B3UUFBQStDYmNKWmJtM0NXV3dBQUFBZHpjMmd0Y25OaEFBQUJBUURLRFRzanhrNlRNZnZ1T1libnVYOEpmWgppNDVtQTdxaStZZUx1WWJJTjNxS0k4eFNLRERkMm80aWExYUhocHlDeXRPanZHYmw3UWJEYXZlWkthWTRuRlRhVXRwY21YCjRJWFM3MVhnanIrS0Qwc3dxOXczOSs5STA3d1VkUkVkbjNHYUNtUzJ4YlJ5TitZYUtNSW9GUTQzdWZVV0JvcjhsTFhCV1oKeGVwSXRXczdFdi9MbTR1RmJMUmpId2d5ZitMZnE5OGJXU1VqL3JrYjRMWWxZSVVpeG9wcDYwUEpXV25uamxYNmM3bXo1RgozRE84NnorajdQczZSMnk2ZllJaVozVXZQZEpFNndSaTZ5RjhlaFVQZzVWZ0c2cTVseUE4TFV4clAyZlhrS3ZoZmpOZHVGClprVUJEd3AyYmQ4MytSOGU4MWxGcDNpVFdiNFdhV0UyaXVody9CQUFBQUF3RUFBUUFBQVFFQW1iSE8xcnUyY1ltSUZnSjAKZURoR1JqWGZ3bWFidFVjVHhXdXhaNVREdkhYdVUwT3hxUGNYTWF3MXZiQ21SL0VZNnZ4dEU5aEpEMG9CbnlGZlAwbVFOeQpHRkVHQVlKUXVKUUpjR1FEYlZ4SE0xd3VRNE0rckpmaUJ4NVMzWHd5elNBVmIrblhsdWRhUEh5UVpRQ3FWWmwxSkErR3dwCnRWQjVvWVpFeUVscUpKeFl6anBFVUxJb3JJWXc2VFpydThBL3JxdEN5cHYzRGwzUmVxclVjZmJsWEtLVGlVMFJ6dlBkT3gKTzdCTitoSmxaSUVLQWszejBpb2VGb0VUNEtqd1R0V2xhMUUydzF5dFFya0VqeUR6ZlhzUkFkUjIvK2VhWUJrTTIyWWY1bApqdU5iVWVJN3A3NjVEQTMyV21kMVZTTHBOL0lKSEhDQXBoOW1HckhnN1grQUFRQUFBSUVBc1V4ZlhuckNZL1BaaG1QRVViCkFiYjVhNHZXZHQzTlJPQ2tDUGNZY2FxQmRHMXNIbUxWTFVDOTM0UWVVZ3hPMmdKNmFlYXZKNlU2b2NMWTR5RXVRUFRadSsKOC9SVFlGc1dCWGRuVW43TWx4dkR5NGpXLzR1N3dvMit5VkNlUGhmalR2cUZEOWtFUWFodEFQRDYrZ0tnOGtHekZTaHZIeQoxUy9DdzliRzg5V2RBQUFBQ0JBUE9TL3lXR0p1Y0RzZmd6ZWFRMHMyeDY5OXVQQjlMSGs2QnVXeXlPa3NnTUdzRW1PMnpFCll4d1AwV1MvMmMrcEgxVk5ZcEo5cXdTaGFSczNkVmdDU1NPN2t3UGhJb0tWRDFXWFBTUjM5cXpacmZ6a3laOHdrOTdZZ0kKNUtpM3NobXBkZGFIMWR2MDk4cldTQWU1OHlVYTFnaDlSaVp5blZNZXhBRTlUMStsZUJBQUFBZ1FEVVcvYVB1WmN6bWhFQQo1N1F1OW9FWE1URnRjZk5ONHRVdHZFVFp3SzJyTllvbzRPSXdRY0tGS1VacThoa2NRUXZyQ0dXLzB2N1l6Q2lhdnlvZW1MCnlWU0FTSURCRkJubnMrRHhPNUVjSW4yUVlrTUkxTjQrbDZ4RHRra28veUluV3ZLTTkxdUtSWTk5L0piSk8xNmFOdHk1L2cKeHl3Z1BlZHVDcklqNFNMWVFRQUFBQ2hoZVhWemFDNXJkVzFoY2tCaGVYVnphR3QxYldGeU1XMXZibVY1ZG1sbGQybHVMbQp4dlkyRnNBUT09Ci0tLS0tRU5EIE9QRU5TU0ggUFJJVkFURSBLRVktLS0tLQo=
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: build-bot
+secrets:
+  - name: rsa
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pull-display
+spec:
+  description: | 
+    This pipeline clones a git repo, then echoes the README file to the stdout.
+  workspaces:
+  - name: shared-data
+    description: | 
+      This workspace contains the cloned repo files, so they can be read by the
+      next task.
+  params:
+    - name: git-repo-url
+      description: The git repo to clone.
+      default: Some message.
+      type: string
+    - name: repo-name
+      description: Name of the repository directory (extracted from URL or explicitly set). Leave empty for auto-detect.
+      default: ""
+      type: string
+  tasks:
+  - name: pull-display
+    taskRef:
+      name: pull-display
+    params: 
+    - name: gitrepourl
+      value: "$(params.git-repo-url)"
+    workspaces:
+    - name: source
+      workspace: shared-data
+  - name: list-files
+    runAfter:
+      - pull-display
+    taskRef:
+      name: list-files
+    params:
+    - name: repo-name
+      value: "$(params.repo-name)"
+    workspaces:
+    - name: source
+      workspace: shared-data

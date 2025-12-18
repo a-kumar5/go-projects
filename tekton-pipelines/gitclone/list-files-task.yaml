@@ -1,0 +1,84 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: list-files
+spec:
+  description: Lists all files in the cloned repository
+  params:
+    - name: repo-name
+      description: Name of the repository directory (extracted from URL)
+      type: string
+      default: ""
+  workspaces:
+    - name: source
+      description: Workspace containing the cloned repository
+  steps:
+    - name: list-repo-files
+      image: alpine:latest
+      script: |
+        #!/usr/bin/env sh
+        set -e
+        
+        WORKSPACE_PATH="$(workspaces.source.path)"
+        echo "Workspace path: $WORKSPACE_PATH"
+        echo ""
+        echo "Contents of workspace:"
+        ls -la "$WORKSPACE_PATH"
+        echo ""
+        echo "All files and directories (including hidden):"
+        find "$WORKSPACE_PATH" -maxdepth 2 | sort
+        echo ""
+        
+        # Find the repository directory
+        if [ -n "$(params.repo-name)" ]; then
+          REPO_DIR="$WORKSPACE_PATH/$(params.repo-name)"
+          echo "Using specified repo-name: $(params.repo-name)"
+        else
+          # Auto-detect: find the first directory in workspace (usually the repo name)
+          echo "Auto-detecting repository directory..."
+          REPO_DIR=$(find "$WORKSPACE_PATH" -maxdepth 1 -type d ! -path "$WORKSPACE_PATH" | head -1)
+          if [ -z "$REPO_DIR" ]; then
+            # If no subdirectory found, check if workspace itself contains git files
+            if [ -d "$WORKSPACE_PATH/.git" ]; then
+              REPO_DIR="$WORKSPACE_PATH"
+              echo "Found .git directory in workspace root, using workspace as repo directory"
+            else
+              echo "Warning: No repository directory found. Checking if clone failed..."
+              echo "Available items in workspace:"
+              find "$WORKSPACE_PATH" -maxdepth 1
+              REPO_DIR="$WORKSPACE_PATH"
+            fi
+          else
+            echo "Auto-detected repository directory: $REPO_DIR"
+          fi
+        fi
+        
+        echo ""
+        echo "Repository directory: $REPO_DIR"
+        echo ""
+        
+        if [ ! -d "$REPO_DIR" ]; then
+          echo "Error: Repository directory not found: $REPO_DIR"
+          echo ""
+          echo "Debugging information:"
+          echo "Workspace contents:"
+          ls -la "$WORKSPACE_PATH"
+          echo ""
+          echo "Searching for any git repositories:"
+          find "$WORKSPACE_PATH" -name ".git" -type d 2>/dev/null || echo "No .git directories found"
+          exit 1
+        fi
+        
+        cd "$REPO_DIR"
+        echo "Current directory: $(pwd)"
+        echo ""
+        echo "=== Listing all files in repository ==="
+        echo ""
+        find . -type f | sort
+        echo ""
+        echo "=== File count ==="
+        echo "Total files: $(find . -type f | wc -l)"
+        echo ""
+        echo "=== Directory structure ==="
+        tree -L 3 2>/dev/null || find . -type d | sort
+

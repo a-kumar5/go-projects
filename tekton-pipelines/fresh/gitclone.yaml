@@ -1,0 +1,126 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+ name: github-repo-clone-task
+spec:
+ workspaces:
+   - name: clonedDirectoryFolder
+     description: Github cloned repo shared folder
+   - name: githubSshFolder
+     description: GitHub SSH credentials shared folder
+ params:
+   - name: repoUrl
+     description: Repository URL to clone from.
+     type: string
+   - name: revision
+     description: Branch, tag .... etc
+     type: string
+     default: "main"
+   - name: deleteExisting
+     description: Clean out the contents of the destination directory if it already exists before cloning.
+     type: string
+     default: "true"
+   - name: userHome
+     description: Absolute path to the user's home directory.
+     type: string
+     default: "/home/git"
+   - name: gitInitImage
+     description: The image providing the git-init binary that this Task runs.
+     type: string
+     default: "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.25.0"
+ steps:
+   - name: clone-git-repo-ssh
+     image: "$(params.gitInitImage)"
+     #image: "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.21.0"
+     env:
+       - name: PARAM_URL
+         value: $(params.repoUrl)
+       - name: PARAM_REVISION
+         value: $(params.revision)
+       - name: WORKSPACE_OUTPUT_PATH
+         value: $(workspaces.clonedDirectoryFolder.path)
+       - name: PARAM_DELETE_EXISTING
+         value: $(params.deleteExisting)
+       - name: WORKSPACE_SSH_DIRECTORY_BOUND
+         value: $(workspaces.githubSshFolder.bound)
+       - name: WORKSPACE_SSH_DIRECTORY_PATH
+         value: $(workspaces.githubSshFolder.path)
+       - name: PARAM_USER_HOME
+         value: $(params.userHome)
+       - name: GIT_SSH_COMMAND
+       #  value: "ssh -i $(params.userHome)/.ssh/id_rsa -F /dev/null -o 'IdentitiesOnly yes'"  # both values work
+         value: "ssh -i $(params.userHome)/.ssh/id_rsa"
+     script: |
+       #!/usr/bin/env sh
+       set -eu
+
+       set -x
+       
+       if [ "${WORKSPACE_SSH_DIRECTORY_BOUND}" = "true" ] ; then
+
+          cp -R "${WORKSPACE_SSH_DIRECTORY_PATH}" "${PARAM_USER_HOME}"/.ssh
+
+          chmod 700 "${PARAM_USER_HOME}"/.ssh
+
+          chmod -R 400 "${PARAM_USER_HOME}"/.ssh/*
+          
+          chmod 600 "${PARAM_USER_HOME}"/.ssh/config         
+                   
+        fi
+        
+       # ln -s "${PARAM_USER_HOME}"/.ssh /tekton/creds  # uncomment this to get rid of this warming: appears to need SSH authentication but no SSH credentials have been provided
+       
+       CHECKOUT_DIR="${WORKSPACE_OUTPUT_PATH}"
+
+       cleandir() {
+
+          # Delete any existing contents of the repo directory if it exists.
+
+          # We don't just "rm -rf ${CHECKOUT_DIR}" because ${CHECKOUT_DIR} might be "/"
+
+          # or the root of a mounted volume.
+
+          if [ -d "${CHECKOUT_DIR}" ] ; then
+
+            # Delete non-hidden files and directories
+
+            rm -rf "${CHECKOUT_DIR:?}"/*
+
+            # Delete files and directories starting with . but excluding ..
+
+            rm -rf "${CHECKOUT_DIR}"/.[!.]*
+
+            # Delete files and directories starting with .. plus any other character
+
+            rm -rf "${CHECKOUT_DIR}"/..?*
+
+          fi
+
+        }
+
+
+        if [ "${PARAM_DELETE_EXISTING}" = "true" ] ; then
+
+          cleandir || true
+
+        fi
+        
+       git config --global --add safe.directory "${WORKSPACE_OUTPUT_PATH}"
+       
+       # uncomment the two lines below if the GIT_SSH_COMMAND env variable is not set
+       
+       #eval "$(ssh-agent -s)"
+        
+       #ssh-add "${PARAM_USER_HOME}"/.ssh/id_rsa
+       
+       /ko-app/git-init \
+         -url="${PARAM_URL}" \
+         -revision="${PARAM_REVISION}" \
+         -path="${CHECKOUT_DIR}"
+       cd "${CHECKOUT_DIR}"
+       EXIT_CODE="$?"
+       if [ "${EXIT_CODE}" != 0 ] ; then
+         exit "${EXIT_CODE}"
+       fi
+       # Verify clone is success by reading readme file.
+       cat ${CHECKOUT_DIR}/README.md
