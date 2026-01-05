@@ -1,0 +1,12 @@
+# sample.tsv - tab-separated values for `cut` testing
+id	name	age	city	occupation
+1	Alice	30	New York	Engineer
+2	Bob	25	Los Angeles	Designer
+3	Charlie	35	Chicago	Teacher
+4	David	28	Boston	
+5	Eve	22	Seattle	Data Analyst
+6	Frank	40	Houston	Manager
+7	Grace	27	Austin	Engineer
+8	Heidi	31	Phoenix	Product Manager
+9	Ivan	29	Denver	Support
+10	Judy	26	Miami	HR
